@@ -1,5 +1,4 @@
 import Course from "./Course"
-import React from "react"
 
 const App = () => {
   const courses = [
