@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const Filter = ({ handleShowChange }) => {
   return (
@@ -29,8 +30,8 @@ const Person = ({ needToShow, handleDelete }) => {
   return (
     <div>
       {needToShow.map((person) => <div key={person.id}>
-        <p>{person.name} {person.number}</p>
-        <button onClick={() => handleDelete(person)}>delete</button>
+        <p style={{ display: 'inline' }}>{person.name} {person.number}</p>
+        <button style={{ display: 'inline' }} onClick={() => handleDelete(person)}>delete</button>
       </div>)}
     </div>
   )
@@ -41,6 +42,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [show, setShow] = useState('')
   const [persons, setPersons] = useState([])
+  const [errorMessage, setErrorMessage] = useState('')
+  const [color, setColor] = useState('green')
 
   useEffect(() => {
     personService
@@ -75,6 +78,22 @@ const App = () => {
             setPersons(persons.map(person => person.name !== newName ? person : returnPerson))
             setNewName('')
             setNewNumber('')
+            setErrorMessage(
+              `Added ${person.name}`
+            )
+            setColor('green')
+            setTimeout(() => {
+              setErrorMessage('')
+            }, 5000);
+          })
+          .catch(error => {
+            setErrorMessage(
+              `Information of ${person.name} has already been removed from server`
+            )
+            setColor('red')
+            setTimeout(() => {
+              setErrorMessage('')
+            }, 5000);
           })
       }
     } else {
@@ -85,6 +104,13 @@ const App = () => {
           setPersons(persons.concat(returnPerson))
           setNewName('')
           setNewNumber('')
+          setErrorMessage(
+            `Added ${personObject.name}`
+          )
+          setColor('green')
+          setTimeout(() => {
+            setErrorMessage('')
+          }, 5000);
         })
     }
   }
@@ -102,6 +128,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} color={color} />
       <Filter handleShowChange={handleChange(setShow)} />
       <h2>Add a new person</h2>
       <PersonForm addPerson={addPerson} handleNameChange={handleChange(setNewName)} handleNumberChange={handleChange(setNewNumber)} />
